@@ -1,10 +1,15 @@
 const sha256 = require('sha256')
 //Requerimos sha256 protocolo hashing
 
+const currentNodeUrl = process.argv[3]
+
 //Inicializamos la cadena y transacciones pendientes, creamos el bloque genesis con standar values
 function Blockchain(){
     this.chain = []
     this.pendingTransactions = []
+
+    this.currentNodeUrl = currentNodeUrl
+    this.networkNodes = []
 
     this.createNewBlock(100, '0', '0')
 }
