@@ -1,4 +1,5 @@
 const sha256 = require('sha256')
+const { v4: uuidv4 } = require('uuid');
 //Requerimos sha256 protocolo hashing
 
 const currentNodeUrl = process.argv[3]
@@ -44,12 +45,19 @@ Blockchain.prototype.createNewTransaction = function(amount, sender, receiver){
     const newTransaction = {
         amount: amount,
         sender: sender,
-        receiver: receiver
+        receiver: receiver,
+        transactionId: uuidv4().split('-').join('')
     };
 
-    this.pendingTransactions.push(newTransaction);
-    return this.getLastBlock()['index'] + 1;
+    return newTransaction
 };
+
+Blockchain.prototype.addTransactionToPendingTransactions = function(transactionObj){
+
+    this.pendingTransactions.push(transactionObj)
+    return this.getLastBlock()['index'] + 1
+
+}
 
 //Toma el previoushash, los datos del current block y el nonce
 //Concatena todo un str y genera hash usando librebria sha256
