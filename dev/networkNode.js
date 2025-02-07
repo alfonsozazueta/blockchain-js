@@ -196,6 +196,45 @@ app.post('/transaction/broadcast', function(req,res){
     })
 })
 
+
+app.get('/consensus', function(req,res){
+    bitcoin.networkNodes.forEach(networkNodeuRL => {
+        const requestPromises = []
+        const requestOptions = {
+            uri: networkNodeuRL + '/blockchain',
+            method: 'GET',
+            json: true
+        }
+
+        requestPromises.push(rp(requestOptions))
+    })
+    Promise.all(requestPromises)
+    .then(blockchains =>{
+        const currentChainLenght = bitcoin.chain.length
+        let maxChainLength = currentChainLenght
+        let newlongestChain = null
+        let newPendingTransactions = null
+        blockchains.forEach(blockchain => {
+            if(blockchain.chain.length > maxChainLength) {
+                maxChainLength = blockchain.chain.length
+                newlongestChain = blockchain.chain
+                newPendingTransactions = blockchain.pendingTransactions
+            }
+        })
+
+        if(!newlongestChain || (newlongestChain && bitcoin.chainIsValid(newlongestChain))){
+            res.json({
+                note: 'Current chain has not been replaced',
+                chain: bitcoin.chain
+            })
+        }
+        else if(newlongestChain && bitcoin.chainIsValid(newlongestChain)){
+            bitcoin.chain = newlongestChain
+            bitcoin.pendingTransactions = newPendingTransactions
+        }
+    })
+})
+
 app.listen(port, function(){
     console.log(`Listening on port ${port}...`)
 })
